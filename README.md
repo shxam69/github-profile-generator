@@ -55,7 +55,9 @@
 <i>Sharpening problem-solving skills one challenge at a time.</i>
 </p>
 
-<img width="100%" src="https://raw.githubusercontent.com/shxam69/shxam69/leetcode/leetcode.svg" alt="LeetCode Stats"/>
+<a href="https://leetcode.com/u/SHYAM-A/">
+<img width="70%" src="https://leetcard.jacoblin.cool/SHYAM-A?theme=dark&font=JetBrains+Mono&ext=contest"/>
+</a>
 
 </div>
 
