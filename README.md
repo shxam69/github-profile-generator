@@ -56,7 +56,7 @@
 </p>
 
 <a href="https://leetcode.com/u/SHYAM-A/">
-<img width=100%" src="https://leetcard.jacoblin.cool/SHYAM-A?theme=dark&font=JetBrains+Mono&ext=contest"/>
+<img width=70%" src="https://leetcard.jacoblin.cool/SHYAM-A?theme=dark&font=JetBrains+Mono&ext=contest"/>
 </a>
 
 </div>
