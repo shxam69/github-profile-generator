@@ -1,0 +1,260 @@
+[
+  {
+    "name": "MasterSequence",
+    "duration": 18.0,
+    "groups": [
+      {
+        "name": "Intro",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 0.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Hold",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 2.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Drift",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 4.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Logo1",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 6.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Transition",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 8.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Logo2",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 10.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Transition",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 12.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Logo3",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 14.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      },
+      {
+        "name": "Return",
+        "target_ids": [],
+        "keyframes": [
+          {
+            "time": 0.0,
+            "properties": {
+              "opacity": 0.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          },
+          {
+            "time": 1.0,
+            "properties": {
+              "opacity": 1.0
+            },
+            "easing": "linear",
+            "interpolation": "lerp"
+          }
+        ],
+        "start_time": 16.0,
+        "duration": 2.0,
+        "delay": 0.0,
+        "repeat": 1,
+        "reverse": false,
+        "easing": "linear"
+      }
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "intro_reveal": {
+    "count": 60,
+    "min_time": 0.0,
+    "max_time": 4.95
+  },
+  "portrait_hold": {
+    "count": 1,
+    "min_time": 4.95,
+    "max_time": 6.95
+  },
+  "drift_start": {
+    "count": 1,
+    "min_time": 6.95,
+    "max_time": 7.05
+  },
+  "drift_band": {
+    "count": 93,
+    "min_time": 6.95,
+    "max_time": 9.35
+  },
+  "traveller_depart": {
+    "count": 900,
+    "min_time": 6.95,
+    "max_time": 8.95
+  },
+  "logo_hold": {
+    "count": 3,
+    "min_time": 8.95,
+    "max_time": 17.95
+  },
+  "logo_transition": {
+    "count": 1800,
+    "min_time": 10.95,
+    "max_time": 15.95
+  },
+  "traveller_return": {
+    "count": 900,
+    "min_time": 17.95,
+    "max_time": 19.95
+  },
+  "portrait_restore": {
+    "count": 93,
+    "min_time": 17.95,
+    "max_time": 20.35
+  }
+}

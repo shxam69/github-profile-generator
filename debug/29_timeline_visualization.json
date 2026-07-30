@@ -1,0 +1,56 @@
+[
+  {
+    "phase": "intro_reveal",
+    "start": 0.0,
+    "end": 4.95,
+    "event_count": 60
+  },
+  {
+    "phase": "portrait_hold",
+    "start": 4.95,
+    "end": 6.95,
+    "event_count": 1
+  },
+  {
+    "phase": "drift_start",
+    "start": 6.95,
+    "end": 7.05,
+    "event_count": 1
+  },
+  {
+    "phase": "drift_band",
+    "start": 6.95,
+    "end": 9.35,
+    "event_count": 93
+  },
+  {
+    "phase": "traveller_depart",
+    "start": 6.95,
+    "end": 8.95,
+    "event_count": 900
+  },
+  {
+    "phase": "logo_hold",
+    "start": 8.95,
+    "end": 17.95,
+    "event_count": 3
+  },
+  {
+    "phase": "logo_transition",
+    "start": 10.95,
+    "end": 15.95,
+    "event_count": 1800
+  },
+  {
+    "phase": "traveller_return",
+    "start": 17.95,
+    "end": 19.95,
+    "event_count": 900
+  },
+  {
+    "phase": "portrait_restore",
+    "start": 17.95,
+    "end": 20.35,
+    "event_count": 93
+  }
+]

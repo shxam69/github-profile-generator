@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "errors": [],
+  "warnings": [
+    {
+      "phase": "4. Graph",
+      "message": "Found 1400 isolated nodes in the graph."
+    },
+    {
+      "phase": "9. Animation Compiler",
+      "message": "Found 1302 overlapping chronological events for the same dots."
+    }
+  ],
+  "metrics": {
+    "execution_time_seconds": 1.586,
+    "memory_usage_mb": 13.84
+  }
+}
