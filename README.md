@@ -12,7 +12,9 @@
 
 <!-- ===== GITHUB STATS ===== -->
 
-<div align="center">
+<p align="center">
+<img src="https://raw.githubusercontent.com/shxam69/github-profile-generator/main/output/animated_profile.svg" width="100%">
+</p>
 
 <!-- Streak — full width -->
 <picture>
