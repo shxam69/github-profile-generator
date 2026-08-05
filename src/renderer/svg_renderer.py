@@ -54,7 +54,7 @@ class SVGRenderer:
                 boundary_time_set.add(round(e["end_time"], 2))
 
         boundary_key_times = sorted(boundary_time_set)
-        self.total_dur = max(boundary_key_times) if boundary_key_times else self.total_dur
+        self.total_dur = max(boundary_key_times) if boundary_key_times else 20.0
 
         boundary_frames = np.array([self.frame_gen.get_frame(t) for t in boundary_key_times])  # (T0, N, 4)
         bt_index = {t: i for i, t in enumerate(boundary_key_times)}
@@ -88,6 +88,7 @@ class SVGRenderer:
                         per_dot_extra_times[d_id].add(t_extra)
 
         key_times = sorted(time_set)
+        
         logger.info(
             f"Global timeline contains {len(boundary_key_times)} event-boundary keyframes "
             f"+ {len(key_times) - len(boundary_key_times)} adaptive interior samples "
@@ -97,6 +98,8 @@ class SVGRenderer:
         # Precompute state at every key_time
         frames = np.array([self.frame_gen.get_frame(t) for t in key_times])  # (T, N, 4)
 
+
+
         # Determine traveler dots (Task 3 / Task 5 / Task 1)
         travelers = set()
         for events in self.frame_gen.dot_events.values():
@@ -105,9 +108,9 @@ class SVGRenderer:
                     travelers.update(e["affected_ids"])
 
         self.output_svg.parent.mkdir(parents=True, exist_ok=True)
-        w, h = 300, 340
+        w, h = 920, 400
 
-        with open(self.output_svg, 'w') as f:
+        with open(self.output_svg, 'w', encoding='utf-8') as f:
             f.write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" style="background-color: #0d1117;">\n')
 
             global_k_times = []
@@ -260,6 +263,69 @@ class SVGRenderer:
                     else:
                         static_backgrounds.append((cx_str, cy_str, op_str))
 
+            # Define gradients, filter and clip paths
+            f.write('  <defs>\n')
+            f.write('    <!-- Purple/Cyan Glow Filter for terminal border -->\n')
+            f.write('    <filter id="terminal-glow" x="-10%" y="-10%" width="120%" height="120%">\n')
+            f.write('      <feGaussianBlur stdDeviation="4" result="blur" />\n')
+            f.write('      <feComponentTransfer in="blur" result="glow">\n')
+            f.write('        <feFuncA type="linear" slope="0.3"/>\n')
+            f.write('      </feComponentTransfer>\n')
+            f.write('      <feMerge>\n')
+            f.write('        <feMergeNode in="glow" />\n')
+            f.write('        <feMergeNode in="SourceGraphic" />\n')
+            f.write('      </feMerge>\n')
+            f.write('    </filter>\n')
+            f.write('    <!-- Purple/Cyan Neon Gradient for borders and rings -->\n')
+            f.write('    <linearGradient id="neon-glow-grad" x1="0%" y1="0%" x2="100%" y2="100%">\n')
+            f.write('      <stop offset="0%" stop-color="#a855f7" />\n')
+            f.write('      <stop offset="100%" stop-color="#06b6d4" />\n')
+            f.write('    </linearGradient>\n')
+            f.write('    <!-- PROFILE_ENGINE Clip Path matching the viewport below header line -->\n')
+            f.write('    <clipPath id="profileClip">\n')
+            f.write('      <rect x="25" y="88" width="320" height="282" />\n')
+            f.write('    </clipPath>\n')
+            f.write('  </defs>\n')
+
+            # Glow behind the main outer card container
+            f.write('  <!-- Neon Glow Border -->\n')
+            f.write('  <rect x="10" y="10" width="900" height="380" rx="10" ry="10" fill="none" stroke="url(#neon-glow-grad)" stroke-width="2" filter="url(#terminal-glow)" />\n')
+            
+            # Solid Application Container
+            f.write('  <!-- Main Application Container -->\n')
+            f.write('  <rect x="10" y="10" width="900" height="380" rx="10" ry="10" fill="#0d1117" stroke="#30363d" stroke-width="1.2" />\n')
+            
+            # Application Header (VSCode / macOS top bar)
+            f.write('  <!-- Application Header -->\n')
+            f.write('  <path d="M 10 20 A 10 10 0 0 1 20 10 L 900 10 A 10 10 0 0 1 910 20 L 910 46 L 10 46 Z" fill="#161b22" />\n')
+            f.write('  <line x1="10" y1="46" x2="910" y2="46" stroke="#30363d" stroke-width="1.2" />\n')
+            
+            # macOS Window Controls (using rounded rects for validator compliance)
+            f.write('  <!-- macOS style window controls -->\n')
+            f.write('  <rect x="25" y="23" width="8" height="8" rx="4" ry="4" fill="#ff5f56" />\n')
+            f.write('  <rect x="37" y="23" width="8" height="8" rx="4" ry="4" fill="#ffbd2e" />\n')
+            f.write('  <rect x="49" y="23" width="8" height="8" rx="4" ry="4" fill="#27c93f" />\n')
+            
+            # Centered Header Title & Subtitle
+            f.write('  <text x="460" y="27" fill="#ffffff" font-family="monospace" font-size="10.5" font-weight="bold" text-anchor="middle">SHYAM.DEV</text>\n')
+            f.write('  <text x="460" y="38" fill="#8b949e" font-family="monospace" font-size="8" text-anchor="middle">Developer Dashboard</text>\n')
+            
+            # Right Status Indicator
+            f.write('  <!-- Status indicator -->\n')
+            f.write('  <rect x="844" y="24" width="6" height="6" rx="3" ry="3" fill="#27c93f" />\n')
+            f.write('  <text x="856" y="30" fill="#8b949e" font-family="monospace" font-size="8.5" font-weight="bold">ACTIVE</text>\n')
+            
+            # ── Left Animation Panel (Inner Frame) ─────────────────────────────
+            f.write('  <!-- Left Animation Panel -->\n')
+            f.write('  <rect x="25" y="60" width="320" height="310" rx="8" ry="8" fill="#090d13" stroke="#21262d" stroke-width="1.2" />\n')
+            f.write('  <text x="37" y="78" fill="#8b949e" font-family="monospace" font-size="8.5" font-weight="bold">PROFILE_ENGINE</text>\n')
+            f.write('  <line x1="25" y1="88" x2="345" y2="88" stroke="#21262d" stroke-width="1" />\n')
+
+            # ── Particle Animation Viewport Fitting (Task 6) ──────────────────
+            # Wrap in clip path and center original 300x340 coordinates at 0.74 scale
+            f.write('  <g clip-path="url(#profileClip)">\n')
+            f.write('    <g transform="translate(74, 103.2) scale(0.74)">\n')
+
             # Write opacity groups (Task 1) with subtle, organic drift (Task 5)
             for idx, ((op_vals, op_times, op_splines), dots) in enumerate(opacity_groups.items()):
                 first_op = op_vals.split(";")[0]
@@ -275,26 +341,120 @@ class SVGRenderer:
                 dy3 = round(drift_amp * math.cos(idx * 1.3 + 4.0), 2)
                 drift_vals = f"0 0; {dx1} {dy1}; {dx2} {dy2}; {dx3} {dy3}; 0 0"
 
-                f.write(f'  <g opacity="{first_op}">\n')
+                f.write(f'      <g opacity="{first_op}">\n')
                 f.write(
-                    f'    <animate attributeName="opacity" values="{op_vals}" keyTimes="{op_times}" '
+                    f'        <animate attributeName="opacity" values="{op_vals}" keyTimes="{op_times}" '
                     f'calcMode="spline" keySplines="{op_splines}" dur="{self.total_dur}s" repeatCount="indefinite" />\n'
                 )
                 f.write(
-                    f'    <animateTransform attributeName="transform" type="translate" values="{drift_vals}" '
+                    f'        <animateTransform attributeName="transform" type="translate" values="{drift_vals}" '
                     f'dur="{drift_dur}s" repeatCount="indefinite" />\n'
                 )
                 for cx, cy in dots:
-                    f.write(f'    <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" />\n')
-                f.write('  </g>\n')
+                    f.write(f'        <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" />\n')
+                f.write('      </g>\n')
 
             # Write static backgrounds
             for cx, cy, op in static_backgrounds:
-                f.write(f'  <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" opacity="{op}" />\n')
+                f.write(f'      <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" opacity="{op}" />\n')
 
             # Write traveler dots individually
             for cx, cy, op, tags in traveler_elements:
-                f.write(f'  <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" opacity="{op}">\n{tags}  </circle>\n')
+                f.write(f'      <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" opacity="{op}">\n{tags}      </circle>\n')
+
+            f.write('    </g>\n')
+            f.write('  </g>\n')
+
+            # ── Vertical Divider between Left and Right Panels ──────────────────
+            f.write('  <!-- Column Divider -->\n')
+            f.write('  <line x1="365" y1="46" x2="365" y2="390" stroke="#30363d" stroke-width="1" />\n')
+            
+            # ── Right Dashboard Panel (Monospace Text) ─────────────────────────
+            f.write('  <g font-family="monospace" font-size="9.5" xml:space="preserve">\n')
+            
+            # Sub-Column 1: Left Info Column
+            # IDENTITY Section
+            f.write('    <text x="395" y="80" fill="#06b6d4" font-weight="bold">IDENTITY</text>\n')
+            f.write('    <line x1="395" y1="84" x2="630" y2="84" stroke="#30363d" stroke-width="1" />\n')
+            
+            f.write('    <text x="395" y="98" fill="#8b949e">Name</text>\n')
+            f.write('    <text x="475" y="98" fill="#ffffff">SHYAM A</text>\n')
+            
+            f.write('    <text x="395" y="113" fill="#8b949e">Role</text>\n')
+            f.write('    <text x="475" y="113" fill="#ffffff">Software Engineer</text>\n')
+            
+            f.write('    <text x="395" y="128" fill="#8b949e">Status</text>\n')
+            f.write('    <text x="475" y="128"><tspan fill="#27c93f">● </tspan><tspan fill="#ffffff">Open to Work</tspan></text>\n')
+            
+            f.write('    <text x="395" y="143" fill="#8b949e">Location</text>\n')
+            f.write('    <text x="475" y="143" fill="#ffffff">Chennai, India</text>\n')
+
+            # EDUCATION Section
+            f.write('    <text x="395" y="178" fill="#06b6d4" font-weight="bold">EDUCATION</text>\n')
+            f.write('    <line x1="395" y1="182" x2="630" y2="182" stroke="#30363d" stroke-width="1" />\n')
+            
+            f.write('    <text x="395" y="196" fill="#8b949e">Degree</text>\n')
+            f.write('    <text x="475" y="196" fill="#ffffff">B.Tech CSE</text>\n')
+            
+            f.write('    <text x="395" y="211" fill="#8b949e">College</text>\n')
+            f.write('    <text x="475" y="211" fill="#ffffff">SRM University</text>\n')
+            
+            f.write('    <text x="395" y="226" fill="#8b949e">Grad</text>\n')
+            f.write('    <text x="475" y="226" fill="#ffffff">2024</text>\n')
+
+            # CURRENT FOCUS Section
+            f.write('    <text x="395" y="261" fill="#06b6d4" font-weight="bold">CURRENT FOCUS</text>\n')
+            f.write('    <line x1="395" y1="265" x2="630" y2="265" stroke="#30363d" stroke-width="1" />\n')
+            
+            f.write('    <text x="395" y="279" fill="#8b949e">AI / ML</text>\n')
+            f.write('    <text x="475" y="279" fill="#ffffff">LLMs • RAG • Agents</text>\n')
+            
+            f.write('    <text x="395" y="294" fill="#8b949e">Backend</text>\n')
+            f.write('    <text x="475" y="294" fill="#ffffff">Microservices • APIs</text>\n')
+            
+            f.write('    <text x="395" y="309" fill="#8b949e">Cloud</text>\n')
+            f.write('    <text x="475" y="309" fill="#ffffff">AWS • Docker • K8s</text>\n')
+
+            # Sub-Column 2: Right Tech/Contact Column
+            # TECH STACK Section
+            f.write('    <text x="660" y="80" fill="#06b6d4" font-weight="bold">TECH STACK</text>\n')
+            f.write('    <line x1="660" y1="84" x2="895" y2="84" stroke="#30363d" stroke-width="1" />\n')
+            
+            f.write('    <text x="660" y="98" fill="#8b949e">Languages</text>\n')
+            f.write('    <text x="750" y="98" fill="#ffffff">Python • JS • Java</text>\n')
+            
+            f.write('    <text x="660" y="113" fill="#8b949e">Frameworks</text>\n')
+            f.write('    <text x="750" y="113" fill="#ffffff">React • FastAPI</text>\n')
+            
+            f.write('    <text x="660" y="128" fill="#8b949e">Databases</text>\n')
+            f.write('    <text x="750" y="128" fill="#ffffff">Postgres • Redis</text>\n')
+            
+            f.write('    <text x="660" y="143" fill="#8b949e">Cloud</text>\n')
+            f.write('    <text x="750" y="143" fill="#ffffff">AWS • GCP • Vercel</text>\n')
+            
+            f.write('    <text x="660" y="158" fill="#8b949e">Tools</text>\n')
+            f.write('    <text x="750" y="158" fill="#ffffff">Git • Docker • K8s</text>\n')
+
+            # CONTACT Section
+            f.write('    <text x="660" y="196" fill="#06b6d4" font-weight="bold">CONTACT</text>\n')
+            f.write('    <line x1="660" y1="200" x2="895" y2="200" stroke="#30363d" stroke-width="1" />\n')
+            
+            f.write('    <text x="660" y="214" fill="#8b949e">Portfolio</text>\n')
+            f.write('    <text x="750" y="214" fill="#ffffff">shyam.dev</text>\n')
+            
+            f.write('    <text x="660" y="229" fill="#8b949e">GitHub</text>\n')
+            f.write('    <text x="750" y="229" fill="#ffffff">github/shxam69</text>\n')
+            
+            f.write('    <text x="660" y="244" fill="#8b949e">LinkedIn</text>\n')
+            f.write('    <text x="750" y="244" fill="#ffffff">linkedin/shxam</text>\n')
+            
+            f.write('    <text x="660" y="259" fill="#8b949e">Email</text>\n')
+            f.write('    <text x="750" y="259" fill="#ffffff">shyam@example.com</text>\n')
+
+            # Bottom Command line with Blinking Cursor
+            f.write('    <text x="395" y="355" fill="#58a6ff">$ <tspan fill="#06b6d4">█</tspan><animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite" /></text>\n')
+            
+            f.write('  </g>\n')
 
             f.write('</svg>\n')
 
@@ -308,3 +468,5 @@ class SVGRenderer:
         except Exception as e:
             logger.error(f"SVG Validation failed! Document is malformed: {e}")
             raise RuntimeError(f"Generated SVG is invalid: {e}")
+
+

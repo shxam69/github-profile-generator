@@ -1,8 +1,8 @@
 {
-  "average_path_length": 180.45,
-  "max_path_length": 390.78,
-  "min_path_length": 16.62,
-  "travel_variance": 4825.8,
+  "average_path_length": 170.13,
+  "max_path_length": 397.74,
+  "min_path_length": 12.43,
+  "travel_variance": 5141.68,
   "collision_estimate": 0,
   "unused_logo_points": 0
 }
