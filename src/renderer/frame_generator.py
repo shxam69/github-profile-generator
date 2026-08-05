@@ -92,37 +92,23 @@ class FrameGenerator:
                     logo_idx = meta["logo"]
                     # wait, if hold, it stays at target. It's already there from previous transition.
                 elif etype == "logo_transition":
-                    from_logo = meta["from_point"]
-                    to_logo = meta["target_point"]
-                    # Determine which logo this transition is leaving from
-                    # We can infer from the event order, or just use the timeline logic: 
-                    # 1->2 or 2->3
-                    # If this is transition 1, it's 1->2.
-                    # We can check the time. But actually, we just need the coordinates.
-                    # Wait, we didn't specify which logo index the target_point belongs to in the compiler metadata!
-                    # Actually, the compiler wrote:
-                    # from_point: t["logo1_point"], target_point: t["logo2_point"]
-                    # We know the keys in logo_coords are 1, 2, 3.
-                    # We can infer logo index by looking up the ID? Or better, we can just find it.
-                    # Let's just find which logo has 'to_logo' ID.
-                    tx, ty = ox, oy
-                    fx, fy = ox, oy
-                    for l_idx in [1, 2, 3]:
-                        if from_logo in self.logo_coords[l_idx]:
-                            fx, fy = self.logo_coords[l_idx][from_logo]
-                        if to_logo in self.logo_coords[l_idx]:
-                            tx, ty = self.logo_coords[l_idx][to_logo]
+                    from_pt = meta["from_point"]
+                    to_pt = meta["target_point"]
+                    from_logo = meta["from_logo"]
+                    target_logo = meta["target_logo"]
+                    
+                    fx, fy = self.logo_coords[from_logo][from_pt]
+                    tx, ty = self.logo_coords[target_logo][to_pt]
                     
                     curr_x = Interpolator.interpolate(fx, tx, progress, easing)
                     curr_y = Interpolator.interpolate(fy, ty, progress, easing)
                 elif etype == "traveller_return":
-                    from_logo = meta["from_point"]
-                    to_dot = meta["target_point"]
-                    fx, fy = ox, oy
-                    for l_idx in [1, 2, 3]:
-                        if from_logo in self.logo_coords[l_idx]:
-                            fx, fy = self.logo_coords[l_idx][from_logo]
-                    tx, ty = self.orig_coords[to_dot]
+                    from_pt = meta["from_point"]
+                    to_pt = meta["target_point"]
+                    from_logo = meta.get("from_logo", 3)
+                    
+                    fx, fy = self.logo_coords[from_logo][from_pt]
+                    tx, ty = self.orig_coords[to_pt]
                     
                     curr_x = Interpolator.interpolate(fx, tx, progress, easing)
                     curr_y = Interpolator.interpolate(fy, ty, progress, easing)

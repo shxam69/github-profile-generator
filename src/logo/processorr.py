@@ -16,27 +16,15 @@ class LogoProcessor:
       • outer contour / symbol edges   (Canny edge response)
       • sharp corners                  (Harris corner response)
       • thin branches / endpoints      (inverse distance-transform weighting)
-      • high-curvature contour points  (local turning-angle response --
-        dragon heads, claws, wing tips, tail get boosted over long,
-        gently-curving edges that happen to also be "edge" pixels)
+      • endpoints / tail tips          (skeleton endpoint boosting)
 
     and suppresses sampling in:
-      • large solid filled interiors   (capped at a fixed probability share)
-
-    Rather than letting the interior's share of the sampling budget fall out
-    implicitly from relative channel weights (previous version), the mask is
-    split into an explicit "feature zone" (edges/corners/thin regions/
-    curvature hot-spots) and a "deep interior zone" (flat fills), and each
-    zone's raw weight is renormalized to sum to a fixed target fraction of
-    the total probability mass -- TARGET_FEATURE_FRACTION (~75%) on features,
-    the remainder (~25%) uniformly across the interior. That 25% interior
-    floor is what keeps the silhouette solid and recognizable rather than
-    collapsing to an outline.
+      • large solid filled interiors   (high distance-transform → low weight)
 
     The total point count is unchanged (LOGO_POINT_COUNT == TRAVELLER_COUNT).
     Output JSON schema is identical to the previous version.
 
-    Phase 2C – Curvature-Weighted, Interior-Capped Logo Sampling
+    Phase 2B – Feature-Aware Logo Sampling
     """
 
     # Long side of the internal high-resolution render canvas (px).
@@ -51,33 +39,7 @@ class LogoProcessor:
     W_EDGE      = 4.0   # Canny edges (contour, symbol outline, thin strokes)
     W_CORNER    = 2.0   # Harris corner response (sharp bends, endpoints)
     W_THIN      = 3.0   # inverse-distance-transform (thin branches, tails, tips)
-    W_CURVE     = 2.5   # local contour curvature (dragon heads, claws, wing tips, tail)
-    W_INTERIOR  = 0.15  # relative-only; see note in _build_weight_map (cancels on renorm)
-
-    # ── curvature channel parameters ──────────────────────────────────────────
-    # Turning-angle estimated at each contour point using a tangent window of
-    # +/- CURVATURE_WINDOW points. Long straight or gently-curving edges (a
-    # dragon's back, a straight limb) produce small turning angles; sharp
-    # direction reversals (claw tips, wing-tip notches, head/snout details,
-    # tail curls) produce large ones. CURVATURE_MIN_ANGLE filters out the
-    # small-angle "noise" naturally present along any polygon-flattened curve
-    # so only genuinely sharp features get boosted.
-    CURVATURE_WINDOW    = 8      # contour-point offset each side for tangent estimation
-    CURVATURE_MIN_ANGLE = 0.25   # radians (~14 deg); below this treated as a straight edge
-
-    # ── explicit feature/interior probability split ───────────────────────────
-    # Target share of total sampling probability mass assigned to the
-    # "feature zone" (edges/corners/thin regions/curvature hot-spots) vs. the
-    # remainder left for the "deep interior" (large flat fills). This makes
-    # the ~75/25 split hold regardless of a given logo's edge-to-area ratio,
-    # instead of emerging unpredictably from the relative channel weights.
-    TARGET_FEATURE_FRACTION = 0.75   # ~75% edge/feature, ~25% interior
-    # Pixels beyond this percentile of in-mask distance-transform values are
-    # considered "deep interior"; everything else (near-edge / thin / corner-
-    # adjacent) is the "feature zone". Lower than DIST_SAT_PERCENTILE (used
-    # for the thin-region gradient) so the interior zone starts well inside
-    # the silhouette, not right at its saturation point.
-    INTERIOR_ZONE_PERCENTILE = 55
+    W_INTERIOR  = 0.15  # residual weight kept inside solid fills (never fully 0)
 
     # Canny thresholds (applied to the HR filled mask).
     CANNY_LOW  = 30
@@ -150,64 +112,9 @@ class LogoProcessor:
             accum = cv2.bitwise_or(accum, path_mask)
         return accum
 
-    # ── curvature channel ────────────────────────────────────────────────────
-
-    def _compute_curvature_map(self, binary: np.ndarray) -> np.ndarray:
-        """Rasterize a per-pixel curvature-response map from the mask's contours.
-
-        For each contour point, estimate the local turning angle between the
-        incoming tangent (point - point[-window]) and outgoing tangent
-        (point[+window] - point), vectorized per contour with np.roll. Sharp
-        turns (claw tips, wing-tip notches, snout/head details, tail curls)
-        produce large angles; long straight or gently-curving runs produce
-        small ones and are filtered out by CURVATURE_MIN_ANGLE. Surviving
-        turning angles are splatted onto their contour-point coordinate, then
-        blurred (same spread radius as the other channels) so the response
-        covers a small neighbourhood rather than a single pixel.
-        """
-        h, w = binary.shape
-        curv_map = np.zeros((h, w), dtype=np.float32)
-        contours, _ = cv2.findContours(binary, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-        k = self.CURVATURE_WINDOW
-
-        for cnt in contours:
-            pts = cnt.reshape(-1, 2).astype(np.float32)
-            n = len(pts)
-            if n < 2 * k + 1:
-                continue
-
-            prev_pts = np.roll(pts, k, axis=0)
-            next_pts = np.roll(pts, -k, axis=0)
-            v1 = pts - prev_pts
-            v2 = next_pts - pts
-            n1 = np.linalg.norm(v1, axis=1)
-            n2 = np.linalg.norm(v2, axis=1)
-            valid = (n1 > 1e-3) & (n2 > 1e-3)
-
-            cos_ang = np.ones(n, dtype=np.float32)
-            denom = np.where(valid, n1 * n2, 1.0)
-            cos_ang = np.clip(np.sum(v1 * v2, axis=1) / denom, -1.0, 1.0)
-            turn = np.arccos(cos_ang)
-            turn[~valid] = 0.0
-
-            sig = turn > self.CURVATURE_MIN_ANGLE
-            if not np.any(sig):
-                continue
-
-            xs = np.clip(pts[sig, 0].astype(np.int32), 0, w - 1)
-            ys = np.clip(pts[sig, 1].astype(np.int32), 0, h - 1)
-            vals = turn[sig]
-            np.maximum.at(curv_map, (ys, xs), vals)
-
-        curv_map = cv2.GaussianBlur(curv_map, (0, 0), self.FEATURE_SPREAD_SIGMA)
-        c_max = curv_map.max()
-        if c_max > 0:
-            curv_map = curv_map / c_max
-        return curv_map
-
     # ── feature-aware weight map ─────────────────────────────────────────────
 
-    def _build_weight_map(self, filled_mask: np.ndarray, feature_fraction: float) -> np.ndarray:
+    def _build_weight_map(self, filled_mask: np.ndarray) -> np.ndarray:
         """Build a float32 sampling-probability map from the filled binary mask.
 
         Strategy
@@ -255,76 +162,30 @@ class LogoProcessor:
         # nearest background pixel.  Thin strokes get small values (~1–3 px),
         # fat filled centres get large values.
         dist = cv2.distanceTransform(binary, cv2.DIST_L2, cv2.DIST_MASK_PRECISE)
+        # Saturation: distances beyond the 90th-percentile are "deep interior"
         in_mask = dist[binary > 127]
         if len(in_mask):
-            # Saturation: distances beyond the 90th-percentile are "deep
-            # interior" for the *gradient* (thin_f falls smoothly to 0).
             sat = np.percentile(in_mask, self.DIST_SAT_PERCENTILE)
             sat = max(sat, 1.0)
-            # Separate, tighter cutoff used below for the *hard* zone split
-            # that enforces the 75/25 probability-mass target.
-            interior_cutoff = np.percentile(in_mask, self.INTERIOR_ZONE_PERCENTILE)
         else:
             sat = 1.0
-            interior_cutoff = 1.0
         # Inverse: thin regions (small dist) → high weight, fat fills → low weight
         dist_clipped = np.clip(dist, 0, sat)
         thin_f = 1.0 - dist_clipped / sat   # ranges [0, 1]; 1 at edges, 0 deep inside
 
-        # ── 4. Curvature channel ───────────────────────────────────────────
-        # Boosts dragon heads, claws, wing tips and tail (high local turning
-        # angle) above long, gently-curving edges (which score high on
-        # edge_f alone but low here).
-        curvature_f = self._compute_curvature_map(binary)
+        # ── 4. Combine channels ───────────────────────────────────────────
+        weight_map = (
+            self.W_EDGE     * edge_f   +
+            self.W_CORNER   * corner_f +
+            self.W_THIN     * thin_f
+        )
 
-        # ── 5. Explicit feature-zone / deep-interior split ─────────────────
-        # binary > 127 is the whole silhouette. Split it into:
-        #   - feature zone: near-edge/near-thin/near-corner pixels (distance
-        #     <= INTERIOR_ZONE_PERCENTILE of in-mask distances)
-        #   - deep interior: everything beyond that cutoff (large flat fills)
-        # Each zone's raw weight is renormalized to sum to a fixed target
-        # share of the final probability mass, so the edge-vs-interior split
-        # is a direct, predictable ~75/25 regardless of how much Canny/
-        # Harris/curvature response a particular logo happens to produce.
+        # Apply a small residual floor everywhere inside the mask so every
+        # covered pixel has at least some chance of being sampled.
         interior = (binary > 127).astype(np.float32)
-        is_deep_interior = (dist > interior_cutoff) & (binary > 127)
-        is_feature_zone = (binary > 127) & (~is_deep_interior)
+        weight_map = weight_map + self.W_INTERIOR * interior
 
-        feature_raw = (
-            self.W_EDGE   * edge_f   +
-            self.W_CORNER * corner_f +
-            self.W_THIN   * thin_f   +
-            self.W_CURVE  * curvature_f
-        ) * is_feature_zone.astype(np.float32)
-        # Small floor so every feature-zone pixel remains reachable even if
-        # it scored ~0 on every channel (e.g. a flat spot right at the
-        # feature/interior boundary).
-        feature_raw += 1e-4 * is_feature_zone.astype(np.float32)
-
-        # Interior weight is uniform (constant magnitude cancels out on
-        # renormalization below, since every deep-interior pixel gets the
-        # same value) -- this deliberately preserves silhouette fill instead
-        # of clustering the residual 25% at a single point.
-        interior_raw = self.W_INTERIOR * is_deep_interior.astype(np.float32)
-        interior_raw += 1e-4 * is_deep_interior.astype(np.float32)
-
-        feature_sum = float(feature_raw.sum())
-        interior_sum = float(interior_raw.sum())
-
-        weight_map = np.zeros_like(feature_raw, dtype=np.float32)
-        if feature_sum > 0:
-            weight_map += (feature_raw / feature_sum) * feature_fraction
-        if interior_sum > 0:
-            weight_map += (interior_raw / interior_sum) * (1.0 - feature_fraction)
-        elif feature_sum > 0:
-            # No deep-interior pixels at all (e.g. a very thin glyph) --
-            # feature zone absorbs the full probability mass rather than
-            # losing it, since renormalizing only the feature share above
-            # would otherwise leave weight_map summing to < 1.
-            weight_map += (feature_raw / feature_sum) * (1.0 - feature_fraction)
-
-        # Zero out pixels outside the logo entirely (defensive; already
-        # implied by the zone masks above).
+        # Zero out pixels outside the logo entirely.
         weight_map *= interior
 
         return weight_map.astype(np.float32)
@@ -538,16 +399,7 @@ class LogoProcessor:
 
             # ── Build feature-aware weight map ───────────────────────────
             logger.info(f"{svg_path.name}: building feature weight map…")
-            logo_name = svg_path.name.lower()
-            if "logo1" in logo_name:
-                feature_fraction = 0.90
-            elif "logo2" in logo_name:
-                feature_fraction = 0.70
-            elif "logo3" in logo_name:
-                feature_fraction = 0.75
-            else:
-                feature_fraction = self.TARGET_FEATURE_FRACTION
-            weight_map = self._build_weight_map(filled_mask, feature_fraction)
+            weight_map = self._build_weight_map(filled_mask)
 
             # ── Sample points ─────────────────────────────────────────────
             rng = np.random.default_rng(42)
