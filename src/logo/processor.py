@@ -540,7 +540,7 @@ class LogoProcessor:
             logger.info(f"{svg_path.name}: building feature weight map…")
             logo_name = svg_path.name.lower()
             if "logo1" in logo_name:
-                feature_fraction = 0.90
+                feature_fraction = 0.95
             elif "logo2" in logo_name:
                 feature_fraction = 0.70
             elif "logo3" in logo_name:
