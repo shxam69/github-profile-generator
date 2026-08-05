@@ -7,41 +7,41 @@
   "portrait_hold": {
     "count": 1,
     "min_time": 4.95,
-    "max_time": 6.95
+    "max_time": 9.45
   },
   "drift_start": {
     "count": 1,
-    "min_time": 6.95,
-    "max_time": 7.05
+    "min_time": 9.45,
+    "max_time": 9.55
   },
   "drift_band": {
     "count": 93,
-    "min_time": 6.95,
-    "max_time": 9.35
+    "min_time": 9.45,
+    "max_time": 13.3
   },
   "traveller_depart": {
     "count": 900,
-    "min_time": 6.95,
-    "max_time": 8.95
+    "min_time": 9.45,
+    "max_time": 11.45
   },
   "logo_hold": {
     "count": 3,
-    "min_time": 8.95,
-    "max_time": 17.95
+    "min_time": 11.45,
+    "max_time": 27.45
   },
   "logo_transition": {
     "count": 1800,
-    "min_time": 10.95,
-    "max_time": 15.95
+    "min_time": 15.45,
+    "max_time": 23.45
   },
   "traveller_return": {
     "count": 900,
-    "min_time": 17.95,
-    "max_time": 19.95
+    "min_time": 27.45,
+    "max_time": 29.45
   },
   "portrait_restore": {
     "count": 93,
-    "min_time": 17.95,
-    "max_time": 20.35
+    "min_time": 27.45,
+    "max_time": 31.3
   }
 }

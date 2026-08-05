@@ -69,7 +69,7 @@ class Config:
     OUTPUT_DRIFT_BANDS_JSON: Path = OUTPUT_DIR / "drift_bands.json"
     
     # Sprint 9: Logo Processing Parameters
-    LOGO_POINT_COUNT: int = 14248  # Target dot count (should match portrait dot count in real run)
+    LOGO_POINT_COUNT: int = 900  # Must exactly match TRAVELLER_COUNT to ensure uniform sparse sampling
     LOGO_SCALE: float = 1.0
     LOGO_PADDING: float = 10.0
     INPUT_LOGOS: List[Path] = [

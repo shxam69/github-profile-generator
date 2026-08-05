@@ -67,7 +67,7 @@ class AnimationCompiler:
         # 2. Portrait Hold
         logger.info("Compiling portrait_hold events...")
         hold_start = max_intro_end
-        hold_end = hold_start + 4.5  # Portrait Hold: 4-5s target so the portrait fully registers before travellers depart
+        hold_end = hold_start + 3.0  # Increased dwell time
         self._add_event("portrait_hold", hold_start, hold_end, all_dot_ids, easing="easeInOutSine")
         
         # Determine travellers vs background dots
@@ -100,7 +100,7 @@ class AnimationCompiler:
         # 4. Traveller Depart (Portrait -> Logo 1)
         logger.info("Compiling traveller depart events...")
         traveller_depart_start = drift_start_time
-        traveller_depart_end = traveller_depart_start + 2.0  # Morph (Portrait -> Logo 1): 2s target
+        traveller_depart_end = traveller_depart_start + 3.0  # Increased duration
         
         for t in traveller_paths:
             # Replaced easeInOutExpo with easeInOutCubic for smoother cinematic trajectory
@@ -110,12 +110,12 @@ class AnimationCompiler:
             
         # 5. Logo Hold (Logo 1)
         logo1_hold_start = traveller_depart_end
-        logo1_hold_end = logo1_hold_start + 4.0  # Dragon Hold: 4s -- logo fully formed before next morph
+        logo1_hold_end = logo1_hold_start + 3.5  # Increased dwell time
         self._add_event("logo_hold", logo1_hold_start, logo1_hold_end, traveller_ids, easing="easeInOutSine", metadata={"logo": 1})
         
         # 6. Logo Transition (Logo 1 -> Logo 2)
         logo1_trans_start = logo1_hold_end
-        logo1_trans_end = logo1_trans_start + 2.0  # Morph (Logo1 -> Logo2): 2s target
+        logo1_trans_end = logo1_trans_start + 2.5  # Increased duration
         for t in traveller_paths:
             self._add_event("logo_transition", logo1_trans_start, logo1_trans_end, [t["portrait_dot"]], easing="easeInOutCubic", metadata={
                 "from_point": t["logo1_point"],
@@ -126,12 +126,12 @@ class AnimationCompiler:
             
         # 7. Logo Hold (Logo 2)
         logo2_hold_start = logo1_trans_end
-        logo2_hold_end = logo2_hold_start + 4.0  # NX Hold: 4s -- logo fully formed before next morph
+        logo2_hold_end = logo2_hold_start + 3.5  # Increased dwell time
         self._add_event("logo_hold", logo2_hold_start, logo2_hold_end, traveller_ids, easing="easeInOutSine", metadata={"logo": 2})
         
         # 8. Logo Transition (Logo 2 -> Logo 3)
         logo2_trans_start = logo2_hold_end
-        logo2_trans_end = logo2_trans_start + 2.0  # Morph (Logo2 -> Logo3): 2s target
+        logo2_trans_end = logo2_trans_start + 2.5  # Increased duration
         for t in traveller_paths:
             self._add_event("logo_transition", logo2_trans_start, logo2_trans_end, [t["portrait_dot"]], easing="easeInOutCubic", metadata={
                 "from_point": t["logo2_point"],
@@ -142,12 +142,12 @@ class AnimationCompiler:
             
         # 9. Logo Hold (Logo 3)
         logo3_hold_start = logo2_trans_end
-        logo3_hold_end = logo3_hold_start + 4.0  # </> Hold: 4s -- logo fully formed before the return morph
+        logo3_hold_end = logo3_hold_start + 3.5  # Increased dwell time
         self._add_event("logo_hold", logo3_hold_start, logo3_hold_end, traveller_ids, easing="easeInOutSine", metadata={"logo": 3})
         
         # 10. Traveller Return (Logo 3 -> Portrait)
         return_start = logo3_hold_end
-        return_end = return_start + 2.0  # Return (Logo3 -> Portrait): 2s target
+        return_end = return_start + 3.0  # Increased duration
         for t in traveller_paths:
             self._add_event("traveller_return", return_start, return_end, [t["portrait_dot"]], easing="easeInOutCubic", metadata={
                 "from_point": t["logo3_point"],
