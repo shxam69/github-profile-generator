@@ -233,6 +233,22 @@ class SVGRenderer:
                         f'    <animate attributeName="fill" values="{col_v_str}" keyTimes="{col_t_str}" '
                         f'calcMode="spline" keySplines="{col_splines}" dur="{self.total_dur}s" repeatCount="indefinite" />\n'
                     )
+                    # Smooth radius system for Dragon (Task 2)
+                    r_times = [0.0, 9.45, 11.45, 15.45, 17.45, self.total_dur]
+                    r_vals = [1.0, 1.0, 1.15, 1.15, 1.0, 1.0]
+                    r_t_str = ";".join(f"{t / self.total_dur:.5f}" for t in r_times)
+                    r_v_str = ";".join(f"{v:g}" for v in r_vals)
+                    r_splines = ";".join([
+                        "0.37 0 0.63 1",
+                        "0.85 0 0.15 1",
+                        "0.37 0 0.63 1",
+                        "0.85 0 0.15 1",
+                        "0.37 0 0.63 1"
+                    ])
+                    animate_tags += (
+                        f'    <animate attributeName="r" values="{r_v_str}" keyTimes="{r_t_str}" '
+                        f'calcMode="spline" keySplines="{r_splines}" dur="{self.total_dur}s" repeatCount="indefinite" />\n'
+                    )
                     traveler_elements.append((cx_str, cy_str, op_str, animate_tags))
                 else:
                     op_vals, op_times, op_splines = build_track(d_id, ops, 2, is_position=False)
