@@ -128,7 +128,7 @@ class SVGRenderer:
         w, h = 920, 400
 
         with open(self.output_svg, 'w', encoding='utf-8') as f:
-            f.write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" style="background-color: #0d1117;">\n')
+            f.write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" style="background-color: #0A101F;">\n')
 
             global_k_times = []
             for idx, t in enumerate(key_times):
@@ -301,11 +301,244 @@ class SVGRenderer:
             f.write('        <feMergeNode in="SourceGraphic" />\n')
             f.write('      </feMerge>\n')
             f.write('    </filter>\n')
+            f.write('    <!-- Subtle Cyan Glow Filter for particles density and soft bloom -->\n')
+            f.write('    <filter id="cyan-glow" x="-20%" y="-20%" width="140%" height="140%">\n')
+            f.write('      <feGaussianBlur stdDeviation="1.2" result="blur" />\n')
+            f.write('      <feComponentTransfer in="blur" result="glow">\n')
+            f.write('        <feFuncA type="linear" slope="0.6"/>\n')
+            f.write('      </feComponentTransfer>\n')
+            f.write('      <feMerge>\n')
+            f.write('        <feMergeNode in="glow" />\n')
+            f.write('        <feMergeNode in="SourceGraphic" />\n')
+            f.write('      </feMerge>\n')
+            f.write('    </filter>\n')
+            f.write('    <!-- Soft Drop Shadow for premium depth -->\n')
+            f.write('    <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="120%">\n')
+            f.write('      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>\n')
+            f.write('    </filter>\n')
+            f.write('    <!-- Subtle Title Glow Pulse Filter -->\n')
+            f.write('    <filter id="title-glow" x="-20%" y="-20%" width="140%" height="140%">\n')
+            f.write('      <feGaussianBlur stdDeviation="2" result="blur" />\n')
+            f.write('      <feComponentTransfer in="blur" result="glow">\n')
+            f.write('        <feFuncA type="linear" slope="0.5"/>\n')
+            f.write('      </feComponentTransfer>\n')
+            f.write('      <feMerge>\n')
+            f.write('        <feMergeNode in="glow" />\n')
+            f.write('        <feMergeNode in="SourceGraphic" />\n')
+            f.write('      </feMerge>\n')
+            f.write('    </filter>\n')
             f.write('    <!-- Purple/Cyan Neon Gradient for borders and rings -->\n')
             f.write('    <linearGradient id="neon-glow-grad" x1="0%" y1="0%" x2="100%" y2="100%">\n')
-            f.write('      <stop offset="0%" stop-color="#a855f7" />\n')
-            f.write('      <stop offset="100%" stop-color="#06b6d4" />\n')
+            f.write('      <stop offset="0%" stop-color="#A78BFA" />\n')
+            f.write('      <stop offset="100%" stop-color="#22D3EE" />\n')
             f.write('    </linearGradient>\n')
+            f.write('    <!-- Premium Translucent Card Background Gradient -->\n')
+            f.write('    <linearGradient id="card-bg" x1="0%" y1="0%" x2="100%" y2="100%">\n')
+            f.write('      <stop offset="0%" stop-color="#0A101F" />\n')
+            f.write('      <stop offset="100%" stop-color="#050810" />\n')
+            f.write('    </linearGradient>\n')
+            scenes = [
+                # Scene 1: Software Engineer
+                {
+                    "start": 0.0,
+                    "end": 7.45,
+                    "clear": 9.45,
+                    "sections": {
+                        "identity": [
+                            ("name", "SHYAM A", 475, 98, 60),
+                            ("role", "Software Engineer", 475, 113, 110),
+                            ("status", "Active Coding", 475, 128, 95, "#10B981"),
+                            ("location", "Chennai, India", 475, 143, 95)
+                        ],
+                        "specialization": [
+                            ("core", "Systems Design", 475, 196, 95),
+                            ("backend", "Java / Python", 475, 211, 95),
+                            ("frontend", "React / TypeScript", 475, 226, 120),
+                            ("nextgen", "AI Systems", 475, 241, 75)
+                        ],
+                        "techstack": [
+                            ("lang", "Java • Python • JS", 750, 98, 120),
+                            ("backend", "Spring Boot • FastAPI", 750, 113, 145),
+                            ("frontend", "React • Tailwind", 750, 128, 110),
+                            ("db", "Postgres • Redis", 750, 143, 110),
+                            ("devops", "Docker • AWS • Git", 750, 158, 125)
+                        ],
+                        "building": [
+                            ("ai", "ProjectForge AI", 750, 214, 110),
+                            ("svg", "Particle Morph Engine", 750, 229, 140),
+                            ("platform", "VYROX", 750, 244, 50)
+                        ],
+                        "terminal": [
+                            ("cmd", "$ whoami", 395, 283, 70, "#A78BFA"),
+                            ("out", "SHYAM A", 395, 298, 60)
+                        ]
+                    }
+                },
+                # Scene 2: Java Full Stack
+                {
+                    "start": 9.45,
+                    "end": 13.45,
+                    "clear": 15.45,
+                    "sections": {
+                        "identity": [
+                            ("name", "SHYAM A", 475, 98, 60),
+                            ("role", "Java Full Stack", 475, 113, 105),
+                            ("status", "Open to Work", 475, 128, 95, "#10B981"),
+                            ("location", "Remote / India", 475, 143, 95)
+                        ],
+                        "specialization": [
+                            ("core", "OOP Architecture", 475, 196, 110),
+                            ("backend", "Microservices", 475, 211, 95),
+                            ("frontend", "Next.js / Angular", 475, 226, 115),
+                            ("nextgen", "Cloud Native", 475, 241, 90)
+                        ],
+                        "techstack": [
+                            ("lang", "Java • SQL • TypeScript", 750, 98, 150),
+                            ("backend", "Spring Cloud • Hibernate", 750, 113, 160),
+                            ("frontend", "React • HTML5 / CSS3", 750, 128, 145),
+                            ("db", "MySQL • MongoDB", 750, 143, 110),
+                            ("devops", "K8s • Jenkins • Maven", 750, 158, 140)
+                        ],
+                        "building": [
+                            ("ai", "Secured Banking API", 750, 214, 135),
+                            ("svg", "Event Bus Broker", 750, 229, 120),
+                            ("platform", "Micro-Frontend Hub", 750, 244, 130)
+                        ],
+                        "terminal": [
+                            ("cmd", "$ stack", 395, 283, 60, "#A78BFA"),
+                            ("out", "Java, Spring Boot, React", 395, 298, 160)
+                        ]
+                    }
+                },
+                # Scene 3: AI Engineer
+                {
+                    "start": 15.45,
+                    "end": 19.45,
+                    "clear": 21.45,
+                    "sections": {
+                        "identity": [
+                            ("name", "SHYAM A", 475, 98, 60),
+                            ("role", "AI Engineer", 475, 113, 85),
+                            ("status", "Researching", 475, 128, 85, "#F59E0B"),
+                            ("location", "Labs / Chennai", 475, 143, 95)
+                        ],
+                        "specialization": [
+                            ("core", "Deep Learning", 475, 196, 95),
+                            ("backend", "FastAPI / PyTorch", 475, 211, 115),
+                            ("frontend", "Streamlit / Gradio", 475, 226, 120),
+                            ("nextgen", "Agentic Workflows", 475, 241, 120)
+                        ],
+                        "techstack": [
+                            ("lang", "Python • Mojo • CUDA", 750, 98, 135),
+                            ("backend", "FastAPI • LangChain", 750, 113, 130),
+                            ("frontend", "React • WebGPU", 750, 128, 95),
+                            ("db", "Chroma • pgvector", 750, 143, 120),
+                            ("devops", "HuggingFace • RunPod", 750, 158, 135)
+                        ],
+                        "building": [
+                            ("ai", "Fine-tuned LLM", 750, 214, 100),
+                            ("svg", "Semantic Search DB", 750, 229, 125),
+                            ("platform", "Autonomous Coder", 750, 244, 120)
+                        ],
+                        "terminal": [
+                            ("cmd", "$ building", 395, 283, 85, "#A78BFA"),
+                            ("out", "ProjectForge AI, Morph Engine", 395, 298, 180)
+                        ]
+                    }
+                },
+                # Scene 4: Open Source Builder
+                {
+                    "start": 21.45,
+                    "end": 25.45,
+                    "clear": 27.45,
+                    "sections": {
+                        "identity": [
+                            ("name", "SHYAM A", 475, 98, 60),
+                            ("role", "Open Source Builder", 475, 113, 130),
+                            ("status", "Collaborating", 475, 128, 95, "#A78BFA"),
+                            ("location", "GitHub / Chennai", 475, 143, 110)
+                        ],
+                        "specialization": [
+                            ("core", "Package Dev", 475, 196, 85),
+                            ("backend", "Go / Node.js", 475, 211, 85),
+                            ("frontend", "Vanilla CSS / SVG", 475, 226, 120),
+                            ("nextgen", "Edge Computing", 475, 241, 100)
+                        ],
+                        "techstack": [
+                            ("lang", "JavaScript • Rust • Go", 750, 98, 150),
+                            ("backend", "Express • GinGonic", 750, 113, 125),
+                            ("frontend", "Svelte • Web Components", 750, 128, 155),
+                            ("db", "SQLite • Redis", 750, 143, 95),
+                            ("devops", "GitHub Actions • Vercel", 750, 158, 160)
+                        ],
+                        "building": [
+                            ("ai", "Particle Morph SVG", 750, 214, 125),
+                            ("svg", "Smil Animation Pack", 750, 229, 135),
+                            ("platform", "Markdown Compiler", 750, 244, 125)
+                        ],
+                        "terminal": [
+                            ("cmd", "$ status", 395, 283, 70, "#A78BFA"),
+                            ("out", "Available", 395, 298, 65, "#10B981")
+                        ]
+                    }
+                }
+            ]
+
+            # Write clipPaths for all scenes and rows
+            for s_idx, scene in enumerate(scenes, 1):
+                start = scene["start"]
+                end = scene["end"]
+                clear = scene["clear"]
+                
+                if s_idx == 1:
+                    sec_timings = [
+                        (0.2, 1.2),
+                        (1.4, 2.4),
+                        (2.6, 3.6),
+                        (3.8, 4.8),
+                        (5.0, 6.5)
+                    ]
+                else:
+                    sec_timings = [
+                        (start + 0.1, start + 0.7),
+                        (start + 0.7, start + 1.3),
+                        (start + 1.3, start + 1.9),
+                        (start + 1.9, start + 2.5),
+                        (start + 2.5, start + 3.2)
+                    ]
+                
+                sections_list = ["identity", "specialization", "techstack", "building", "terminal"]
+                for sec_name, (sec_start, sec_end) in zip(sections_list, sec_timings):
+                    rows = scene["sections"][sec_name]
+                    n_rows = len(rows)
+                    row_dur = (sec_end - sec_start) / n_rows
+                    
+                    for r_idx, row in enumerate(rows):
+                        row_name = row[0]
+                        row_val = row[1]
+                        row_x = row[2]
+                        row_y = row[3]
+                        row_w = row[4]
+                        
+                        r_start = sec_start + r_idx * row_dur
+                        r_end = r_start + row_dur * 0.85
+                        
+                        clip_id = f"clip-s{s_idx}-{sec_name}-{row_name}"
+                        
+                        k0 = f"{0.0:.5f}"
+                        k1 = f"{r_start / 31.3:.5f}"
+                        k2 = f"{r_end / 31.3:.5f}"
+                        k3 = f"{end / 31.3:.5f}"
+                        k4 = f"{clear / 31.3:.5f}"
+                        k5 = f"{1.0:.5f}"
+                        
+                        f.write(f'    <clipPath id="{clip_id}">\n')
+                        f.write(f'      <rect x="{row_x}" y="{row_y - 9}" height="15" width="0">\n')
+                        f.write(f'        <animate attributeName="width" values="0;0;{row_w};{row_w};0;0" ')
+                        f.write(f'keyTimes="{k0};{k1};{k2};{k3};{k4};{k5}" dur="31.3s" repeatCount="indefinite" />\n')
+                        f.write(f'      </rect>\n')
+                        f.write(f'    </clipPath>\n')
+
             f.write('    <!-- PROFILE_ENGINE Clip Path matching the viewport below header line -->\n')
             f.write('    <clipPath id="profileClip">\n')
             f.write('      <rect x="25" y="88" width="320" height="282" />\n')
@@ -316,14 +549,14 @@ class SVGRenderer:
             f.write('  <!-- Neon Glow Border -->\n')
             f.write('  <rect x="10" y="10" width="900" height="380" rx="10" ry="10" fill="none" stroke="url(#neon-glow-grad)" stroke-width="2" filter="url(#terminal-glow)" />\n')
             
-            # Solid Application Container
+            # Solid Application Container (using premium drop shadow & glass-like border)
             f.write('  <!-- Main Application Container -->\n')
-            f.write('  <rect x="10" y="10" width="900" height="380" rx="10" ry="10" fill="#0d1117" stroke="#30363d" stroke-width="1.2" />\n')
+            f.write('  <rect x="10" y="10" width="900" height="380" rx="10" ry="10" fill="url(#card-bg)" stroke="#1E293B" stroke-width="1.2" filter="url(#card-shadow)" />\n')
             
             # Application Header (VSCode / macOS top bar)
             f.write('  <!-- Application Header -->\n')
-            f.write('  <path d="M 10 20 A 10 10 0 0 1 20 10 L 900 10 A 10 10 0 0 1 910 20 L 910 46 L 10 46 Z" fill="#161b22" />\n')
-            f.write('  <line x1="10" y1="46" x2="910" y2="46" stroke="#30363d" stroke-width="1.2" />\n')
+            f.write('  <path d="M 10 20 A 10 10 0 0 1 20 10 L 900 10 A 10 10 0 0 1 910 20 L 910 46 L 10 46 Z" fill="#0C1424" />\n')
+            f.write('  <line x1="10" y1="46" x2="910" y2="46" stroke="#1E293B" stroke-width="1.2" />\n')
             
             # macOS Window Controls (using rounded rects for validator compliance)
             f.write('  <!-- macOS style window controls -->\n')
@@ -331,25 +564,40 @@ class SVGRenderer:
             f.write('  <rect x="37" y="23" width="8" height="8" rx="4" ry="4" fill="#ffbd2e" />\n')
             f.write('  <rect x="49" y="23" width="8" height="8" rx="4" ry="4" fill="#27c93f" />\n')
             
-            # Centered Header Title & Subtitle
-            f.write('  <text x="460" y="24" fill="#ffffff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">SHYAM.DEV</text>\n')
-            f.write('  <text x="460" y="39" fill="#8b949e" font-family="monospace" font-size="8" text-anchor="middle">Developer Dashboard</text>\n')
+            # Centered Header Title & Subtitle with title glow pulse
+            f.write('  <!-- Header Title (with pulsing glow layer) -->\n')
+            f.write('  <text x="460" y="24" fill="#22D3EE" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle" filter="url(#title-glow)">\n')
+            f.write('    <animate attributeName="opacity" values="0.2;0.8;0.2" dur="2s" repeatCount="indefinite" />\n')
+            f.write('    SHYAM.DEV\n')
+            f.write('  </text>\n')
+            f.write('  <text x="460" y="24" fill="#F8FAFC" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">SHYAM.DEV</text>\n')
+            f.write('  <text x="460" y="39" fill="#94A3B8" font-family="monospace" font-size="8" text-anchor="middle">Developer Dashboard</text>\n')
             
-            # Right Status Indicator
+            # Right Status Indicator with soft pulse animation
             f.write('  <!-- Status indicator -->\n')
-            f.write('  <rect x="844" y="24" width="6" height="6" rx="3" ry="3" fill="#27c93f" />\n')
-            f.write('  <text x="856" y="30" fill="#8b949e" font-family="monospace" font-size="8.5" font-weight="bold">ACTIVE</text>\n')
+            f.write('  <g>\n')
+            f.write('    <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite" />\n')
+            f.write('    <rect x="844" y="24" width="6" height="6" rx="3" ry="3" fill="#10B981" />\n')
+            f.write('    <text x="856" y="30" fill="#10B981" font-family="monospace" font-size="8.5" font-weight="bold">ACTIVE</text>\n')
+            f.write('  </g>\n')
             
-            # ── Left Animation Panel (Inner Frame) ─────────────────────────────
+            # ── Left Animation Panel (Inner Frame with glass backdrop look) ─────────────────────────────
             f.write('  <!-- Left Animation Panel -->\n')
-            f.write('  <rect x="25" y="60" width="320" height="310" rx="8" ry="8" fill="#090d13" stroke="#21262d" stroke-width="1.2" />\n')
-            f.write('  <text x="37" y="78" fill="#8b949e" font-family="monospace" font-size="8.5" font-weight="bold">PARTICLE ENGINE</text>\n')
-            f.write('  <line x1="25" y1="88" x2="345" y2="88" stroke="#21262d" stroke-width="1" />\n')
+            f.write('  <rect x="25" y="60" width="320" height="310" rx="8" ry="8" fill="#03071280" stroke="#1E293B" stroke-width="1.2" />\n')
+            f.write('  <text x="37" y="78" fill="#22D3EE" font-family="monospace" font-size="8.5" font-weight="bold">PARTICLE ENGINE</text>\n')
+            f.write('  <line x1="25" y1="88" x2="345" y2="88" stroke="#1E293B" stroke-width="1" />\n')
 
-            # ── Particle Animation Viewport Fitting (Task 6) ──────────────────
+            # ── Particle Animation Viewport Fitting ──────────────────
             # Wrap in clip path and center original 300x340 coordinates at 0.885 scale
             f.write('  <g clip-path="url(#profileClip)">\n')
-            f.write('    <g transform="translate(52.25, 54.7) scale(0.885)">\n')
+            # Outer wrapper for translation (6s) and scale (7s) breathing effect
+            f.write('    <g>\n')
+            f.write('      <animateTransform attributeName="transform" type="translate" values="0,0; 0,2; 0,0" dur="6s" repeatCount="indefinite" additive="sum" />\n')
+            f.write('      <g transform="translate(185, 220)">\n')
+            f.write('        <animateTransform attributeName="transform" type="scale" values="1; 1.015; 1" dur="7s" repeatCount="indefinite" additive="sum" />\n')
+            f.write('        <g transform="translate(-185, -220)">\n')
+            # The particle rendering group with a cyan glow filter for apparent density and soft bloom
+            f.write('          <g transform="translate(52.25, 54.7) scale(0.885)" filter="url(#cyan-glow)">\n')
 
             # Write opacity groups (Task 1) with subtle, organic drift (Task 5)
             for idx, ((op_vals, op_times, op_splines), dots) in enumerate(opacity_groups.items()):
@@ -387,100 +635,130 @@ class SVGRenderer:
             for cx, cy, op, tags in traveler_elements:
                 f.write(f'      <circle cx="{cx}" cy="{cy}" r="1" fill="#E6EDF3" opacity="{op}">\n{tags}      </circle>\n')
 
+            # Close the nested breathing and rendering groups
+            f.write('          </g>\n')
+            f.write('        </g>\n')
+            f.write('      </g>\n')
             f.write('    </g>\n')
             f.write('  </g>\n')
 
             # ── Vertical Divider between Left and Right Panels ──────────────────
             f.write('  <!-- Column Divider -->\n')
-            f.write('  <line x1="365" y1="46" x2="365" y2="390" stroke="#30363d" stroke-width="1" />\n')
+            f.write('  <line x1="365" y1="46" x2="365" y2="390" stroke="#1E293B" stroke-width="1.2" />\n')
             
             # ── Right Dashboard Panel (Monospace Text) ─────────────────────────
             f.write('  <g font-family="monospace" font-size="9.5" xml:space="preserve">\n')
             
-            # Sub-Column 1: Left Info Column
-            # IDENTITY Section
-            f.write('    <text x="395" y="80" fill="#06b6d4" font-weight="bold">IDENTITY</text>\n')
-            f.write('    <line x1="395" y1="84" x2="630" y2="84" stroke="#30363d" stroke-width="1" />\n')
+            # Static Labels (These remain completely static while values type)
+            # Column 1 Labels
+            f.write('    <!-- Static Labels Column 1 -->\n')
+            f.write('    <text x="395" y="80" fill="#22D3EE" font-weight="bold">IDENTITY</text>\n')
+            f.write('    <line x1="395" y1="84" x2="630" y2="84" stroke="#1E293B" stroke-width="1" />\n')
+            f.write('    <text x="395" y="98" fill="#94A3B8">Name</text>\n')
+            f.write('    <text x="395" y="113" fill="#94A3B8">Role</text>\n')
+            f.write('    <text x="395" y="128" fill="#94A3B8">Status</text>\n')
+            f.write('    <text x="395" y="143" fill="#94A3B8">Location</text>\n')
             
-            f.write('    <text x="395" y="98" fill="#8b949e">Name</text>\n')
-            f.write('    <text x="475" y="98" fill="#ffffff">SHYAM A</text>\n')
+            f.write('    <text x="395" y="178" fill="#22D3EE" font-weight="bold">SPECIALIZATION</text>\n')
+            f.write('    <line x1="395" y1="182" x2="630" y2="182" stroke="#1E293B" stroke-width="1" />\n')
+            f.write('    <text x="395" y="196" fill="#94A3B8">Core</text>\n')
+            f.write('    <text x="395" y="211" fill="#94A3B8">Backend</text>\n')
+            f.write('    <text x="395" y="226" fill="#94A3B8">Frontend</text>\n')
+            f.write('    <text x="395" y="241" fill="#94A3B8">Next Gen</text>\n')
             
-            f.write('    <text x="395" y="113" fill="#8b949e">Role</text>\n')
-            f.write('    <text x="475" y="113" fill="#ffffff">Software Engineer</text>\n')
+            f.write('    <text x="395" y="265" fill="#22D3EE" font-weight="bold">TERMINAL</text>\n')
+            f.write('    <line x1="395" y1="269" x2="630" y2="269" stroke="#1E293B" stroke-width="1" />\n')
             
-            f.write('    <text x="395" y="128" fill="#8b949e">Status</text>\n')
-            f.write('    <text x="475" y="128"><tspan fill="#27c93f">● </tspan><tspan fill="#ffffff">Open to Work</tspan></text>\n')
+            # Column 2 Labels
+            f.write('    <!-- Static Labels Column 2 -->\n')
+            f.write('    <text x="660" y="80" fill="#22D3EE" font-weight="bold">TECH STACK</text>\n')
+            f.write('    <line x1="660" y1="84" x2="895" y2="84" stroke="#1E293B" stroke-width="1" />\n')
+            f.write('    <text x="660" y="98" fill="#94A3B8">Languages</text>\n')
+            f.write('    <text x="660" y="113" fill="#94A3B8">Backend</text>\n')
+            f.write('    <text x="660" y="128" fill="#94A3B8">Frontend</text>\n')
+            f.write('    <text x="660" y="143" fill="#94A3B8">Databases</text>\n')
+            f.write('    <text x="660" y="158" fill="#94A3B8">DevOps</text>\n')
             
-            f.write('    <text x="395" y="143" fill="#8b949e">Location</text>\n')
-            f.write('    <text x="475" y="143" fill="#ffffff">Chennai, India</text>\n')
+            f.write('    <text x="660" y="196" fill="#22D3EE" font-weight="bold">CURRENTLY BUILDING</text>\n')
+            f.write('    <line x1="660" y1="200" x2="895" y2="200" stroke="#1E293B" stroke-width="1" />\n')
+            f.write('    <text x="660" y="214" fill="#94A3B8">AI Agent</text>\n')
+            f.write('    <text x="660" y="229" fill="#94A3B8">SVG Engine</text>\n')
+            f.write('    <text x="660" y="244" fill="#94A3B8">Platform</text>\n')
 
-            # EDUCATION Section
-            f.write('    <text x="395" y="178" fill="#06b6d4" font-weight="bold">EDUCATION</text>\n')
-            f.write('    <line x1="395" y1="182" x2="630" y2="182" stroke="#30363d" stroke-width="1" />\n')
-            
-            f.write('    <text x="395" y="196" fill="#8b949e">Degree</text>\n')
-            f.write('    <text x="475" y="196" fill="#ffffff">B.Tech CSE</text>\n')
-            
-            f.write('    <text x="395" y="211" fill="#8b949e">College</text>\n')
-            f.write('    <text x="475" y="211" fill="#ffffff">SRM University</text>\n')
-            
-            f.write('    <text x="395" y="226" fill="#8b949e">Grad</text>\n')
-            f.write('    <text x="475" y="226" fill="#ffffff">2024</text>\n')
-
-            # CURRENT FOCUS Section
-            f.write('    <text x="395" y="261" fill="#06b6d4" font-weight="bold">CURRENT FOCUS</text>\n')
-            f.write('    <line x1="395" y1="265" x2="630" y2="265" stroke="#30363d" stroke-width="1" />\n')
-            
-            f.write('    <text x="395" y="279" fill="#8b949e">AI / ML</text>\n')
-            f.write('    <text x="475" y="279" fill="#ffffff">LLMs • RAG • Agents</text>\n')
-            
-            f.write('    <text x="395" y="294" fill="#8b949e">Backend</text>\n')
-            f.write('    <text x="475" y="294" fill="#ffffff">Microservices • APIs</text>\n')
-            
-            f.write('    <text x="395" y="309" fill="#8b949e">Cloud</text>\n')
-            f.write('    <text x="475" y="309" fill="#ffffff">AWS • Docker • K8s</text>\n')
-
-            # Sub-Column 2: Right Tech/Contact Column
-            # TECH STACK Section
-            f.write('    <text x="660" y="80" fill="#06b6d4" font-weight="bold">TECH STACK</text>\n')
-            f.write('    <line x1="660" y1="84" x2="895" y2="84" stroke="#30363d" stroke-width="1" />\n')
-            
-            f.write('    <text x="660" y="98" fill="#8b949e">Languages</text>\n')
-            f.write('    <text x="750" y="98" fill="#ffffff">Python • JS • Java</text>\n')
-            
-            f.write('    <text x="660" y="113" fill="#8b949e">Frameworks</text>\n')
-            f.write('    <text x="750" y="113" fill="#ffffff">React • FastAPI</text>\n')
-            
-            f.write('    <text x="660" y="128" fill="#8b949e">Databases</text>\n')
-            f.write('    <text x="750" y="128" fill="#ffffff">Postgres • Redis</text>\n')
-            
-            f.write('    <text x="660" y="143" fill="#8b949e">Cloud</text>\n')
-            f.write('    <text x="750" y="143" fill="#ffffff">AWS • GCP • Vercel</text>\n')
-            
-            f.write('    <text x="660" y="158" fill="#8b949e">Tools</text>\n')
-            f.write('    <text x="750" y="158" fill="#ffffff">Git • Docker • K8s</text>\n')
-
-            # CONTACT Section
-            f.write('    <text x="660" y="196" fill="#06b6d4" font-weight="bold">CONTACT</text>\n')
-            f.write('    <line x1="660" y1="200" x2="895" y2="200" stroke="#30363d" stroke-width="1" />\n')
-            
-            f.write('    <text x="660" y="214" fill="#8b949e">Portfolio</text>\n')
-            f.write('    <text x="750" y="214" fill="#ffffff">shyam.dev</text>\n')
-            
-            f.write('    <text x="660" y="229" fill="#8b949e">GitHub</text>\n')
-            f.write('    <text x="750" y="229" fill="#ffffff">github/shxam69</text>\n')
-            
-            f.write('    <text x="660" y="244" fill="#8b949e">LinkedIn</text>\n')
-            f.write('    <text x="750" y="244" fill="#ffffff">linkedin/shxam</text>\n')
-            
-            f.write('    <text x="660" y="259" fill="#8b949e">Email</text>\n')
-            f.write('    <text x="750" y="259" fill="#ffffff">shyam666fg@gmail.com</text>\n')
-
-            # Bottom Command line with Blinking Cursor
-            f.write('    <text x="395" y="355" fill="#58a6ff">$ <tspan fill="#06b6d4">█</tspan><animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite" /></text>\n')
+            # Write the scene text elements and their cursors
+            for s_idx, scene in enumerate(scenes, 1):
+                start = scene["start"]
+                end = scene["end"]
+                clear = scene["clear"]
+                
+                if s_idx == 1:
+                    sec_timings = [
+                        (0.2, 1.2),
+                        (1.4, 2.4),
+                        (2.6, 3.6),
+                        (3.8, 4.8),
+                        (5.0, 6.5)
+                    ]
+                else:
+                    sec_timings = [
+                        (start + 0.1, start + 0.7),
+                        (start + 0.7, start + 1.3),
+                        (start + 1.3, start + 1.9),
+                        (start + 1.9, start + 2.5),
+                        (start + 2.5, start + 3.2)
+                    ]
+                
+                sections_list = ["identity", "specialization", "techstack", "building", "terminal"]
+                
+                k0 = f"{0.0:.5f}"
+                k_start = f"{start / 31.3:.5f}"
+                k_clear = f"{clear / 31.3:.5f}"
+                k5 = f"{1.0:.5f}"
+                
+                f.write(f'    <!-- SCENE {s_idx} VALUES -->\n')
+                f.write(f'    <g>\n')
+                f.write(f'      <animate attributeName="visibility" values="hidden;visible;hidden" keyTimes="{k0};{k_start};{k_clear}" dur="31.3s" repeatCount="indefinite" />\n')
+                
+                for sec_name, (sec_start, sec_end) in zip(sections_list, sec_timings):
+                    rows = scene["sections"][sec_name]
+                    n_rows = len(rows)
+                    row_dur = (sec_end - sec_start) / n_rows
+                    
+                    for r_idx, row in enumerate(rows):
+                        row_name = row[0]
+                        row_val = row[1]
+                        row_x = row[2]
+                        row_y = row[3]
+                        row_w = row[4]
+                        row_color = row[5] if len(row) > 5 else "#F8FAFC"
+                        
+                        r_start = sec_start + r_idx * row_dur
+                        r_end = r_start + row_dur * 0.85
+                        
+                        clip_id = f"clip-s{s_idx}-{sec_name}-{row_name}"
+                        
+                        if row_name == "status":
+                            f.write(f'      <text x="{row_x}" y="{row_y}" clip-path="url(#{clip_id})"><tspan fill="{row_color}">● </tspan><tspan fill="#F8FAFC">{row_val}</tspan></text>\n')
+                        else:
+                            f.write(f'      <text x="{row_x}" y="{row_y}" fill="{row_color}" clip-path="url(#{clip_id})">{row_val}</text>\n')
+                        
+                        # Blinking typing cursor
+                        c0 = f"{0.0:.5f}"
+                        c1 = f"{r_start / 31.3:.5f}"
+                        c2 = f"{r_end / 31.3:.5f}"
+                        c3 = f"{1.0:.5f}"
+                        
+                        f.write(f'      <g>\n')
+                        f.write(f'        <animate attributeName="visibility" values="hidden;visible;hidden" keyTimes="{c0};{c1};{c2};{c3}" dur="31.3s" repeatCount="indefinite" />\n')
+                        f.write(f'        <rect x="{row_x}" y="{row_y-8}" width="5" height="10" fill="#22D3EE">\n')
+                        f.write(f'          <animateTransform attributeName="transform" type="translate" values="0,0; {row_w},0; {row_w},0" keyTimes="{c0};{c1};{c2}" dur="31.3s" repeatCount="indefinite" />\n')
+                        f.write(f'          <animate attributeName="opacity" values="1;0;1" dur="0.65s" repeatCount="indefinite" />\n')
+                        f.write(f'        </rect>\n')
+                        f.write(f'      </g>\n')
+                
+                f.write(f'    </g>\n')
             
             f.write('  </g>\n')
-
             f.write('</svg>\n')
 
         logger.info(f"SVG completely written. File size: {self.output_svg.stat().st_size / 1024 / 1024:.2f} MB")
