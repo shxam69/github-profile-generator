@@ -98,6 +98,23 @@ class SVGRenderer:
         # Precompute state at every key_time
         frames = np.array([self.frame_gen.get_frame(t) for t in key_times])  # (T, N, 4)
 
+        # ── Loop transition smoothing (Task 6) ──────────────────────────────
+        # Smoothly blend the final 0.5s of opacity to match the first frame (0.0s)
+        fade_start_t = self.total_dur - 0.5
+        fade_start_idx = 0
+        for idx, t in enumerate(key_times):
+            if t <= fade_start_t:
+                fade_start_idx = idx
+        fade_start_actual_t = key_times[fade_start_idx]
+        if self.total_dur - fade_start_actual_t > 0.01:
+            for idx in range(fade_start_idx + 1, len(key_times)):
+                t = key_times[idx]
+                factor = (self.total_dur - t) / (self.total_dur - fade_start_actual_t)
+                for d_id in range(self.frame_gen.num_dots):
+                    op_start = frames[fade_start_idx, d_id, 2]
+                    op_end = frames[0, d_id, 2]
+                    frames[idx, d_id, 2] = op_start * factor + op_end * (1.0 - factor)
+
 
 
         # Determine traveler dots (Task 3 / Task 5 / Task 1)
@@ -236,18 +253,26 @@ class SVGRenderer:
                         f'    <animate attributeName="fill" values="{col_v_str}" keyTimes="{col_t_str}" '
                         f'calcMode="spline" keySplines="{col_splines}" dur="{self.total_dur}s" repeatCount="indefinite" />\n'
                     )
-                    # Smooth radius system for Dragon (Task 2)
-                    r_times = [0.0, 9.45, 11.45, 15.45, 17.45, self.total_dur]
-                    r_vals = [1.0, 1.0, 1.15, 1.15, 1.0, 1.0]
+                    # Smooth radius system for traveler morphs (Task 2)
+                    r_times = [
+                        0.0,
+                        7.45, 8.45, 9.45,
+                        13.45, 14.45, 15.45,
+                        19.45, 20.45, 21.45,
+                        25.45, 26.45, 27.45,
+                        self.total_dur
+                    ]
+                    r_vals = [
+                        1.0,
+                        1.0, 1.15, 1.0,
+                        1.0, 1.15, 1.0,
+                        1.0, 1.15, 1.0,
+                        1.0, 1.15, 1.0,
+                        1.0
+                    ]
                     r_t_str = ";".join(f"{t / self.total_dur:.5f}" for t in r_times)
                     r_v_str = ";".join(f"{v:g}" for v in r_vals)
-                    r_splines = ";".join([
-                        "0.37 0 0.63 1",
-                        "0.85 0 0.15 1",
-                        "0.37 0 0.63 1",
-                        "0.85 0 0.15 1",
-                        "0.37 0 0.63 1"
-                    ])
+                    r_splines = ";".join(["0.37 0 0.63 1"] * (len(r_times) - 1))
                     animate_tags += (
                         f'    <animate attributeName="r" values="{r_v_str}" keyTimes="{r_t_str}" '
                         f'calcMode="spline" keySplines="{r_splines}" dur="{self.total_dur}s" repeatCount="indefinite" />\n'
@@ -307,8 +332,8 @@ class SVGRenderer:
             f.write('  <rect x="49" y="23" width="8" height="8" rx="4" ry="4" fill="#27c93f" />\n')
             
             # Centered Header Title & Subtitle
-            f.write('  <text x="460" y="27" fill="#ffffff" font-family="monospace" font-size="10.5" font-weight="bold" text-anchor="middle">SHYAM.DEV</text>\n')
-            f.write('  <text x="460" y="38" fill="#8b949e" font-family="monospace" font-size="8" text-anchor="middle">Developer Dashboard</text>\n')
+            f.write('  <text x="460" y="24" fill="#ffffff" font-family="monospace" font-size="13" font-weight="bold" text-anchor="middle">SHYAM.DEV</text>\n')
+            f.write('  <text x="460" y="39" fill="#8b949e" font-family="monospace" font-size="8" text-anchor="middle">Developer Dashboard</text>\n')
             
             # Right Status Indicator
             f.write('  <!-- Status indicator -->\n')
@@ -318,13 +343,13 @@ class SVGRenderer:
             # ── Left Animation Panel (Inner Frame) ─────────────────────────────
             f.write('  <!-- Left Animation Panel -->\n')
             f.write('  <rect x="25" y="60" width="320" height="310" rx="8" ry="8" fill="#090d13" stroke="#21262d" stroke-width="1.2" />\n')
-            f.write('  <text x="37" y="78" fill="#8b949e" font-family="monospace" font-size="8.5" font-weight="bold">PROFILE_ENGINE</text>\n')
+            f.write('  <text x="37" y="78" fill="#8b949e" font-family="monospace" font-size="8.5" font-weight="bold">PARTICLE ENGINE</text>\n')
             f.write('  <line x1="25" y1="88" x2="345" y2="88" stroke="#21262d" stroke-width="1" />\n')
 
             # ── Particle Animation Viewport Fitting (Task 6) ──────────────────
-            # Wrap in clip path and center original 300x340 coordinates at 0.74 scale
+            # Wrap in clip path and center original 300x340 coordinates at 0.885 scale
             f.write('  <g clip-path="url(#profileClip)">\n')
-            f.write('    <g transform="translate(74, 103.2) scale(0.74)">\n')
+            f.write('    <g transform="translate(52.25, 54.7) scale(0.885)">\n')
 
             # Write opacity groups (Task 1) with subtle, organic drift (Task 5)
             for idx, ((op_vals, op_times, op_splines), dots) in enumerate(opacity_groups.items()):
@@ -449,7 +474,7 @@ class SVGRenderer:
             f.write('    <text x="750" y="244" fill="#ffffff">linkedin/shxam</text>\n')
             
             f.write('    <text x="660" y="259" fill="#8b949e">Email</text>\n')
-            f.write('    <text x="750" y="259" fill="#ffffff">shyam@example.com</text>\n')
+            f.write('    <text x="750" y="259" fill="#ffffff">shyam666fg@gmail.com</text>\n')
 
             # Bottom Command line with Blinking Cursor
             f.write('    <text x="395" y="355" fill="#58a6ff">$ <tspan fill="#06b6d4">█</tspan><animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite" /></text>\n')
